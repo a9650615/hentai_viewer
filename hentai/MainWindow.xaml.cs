@@ -54,8 +54,22 @@ namespace hentai
 
         }
 
+        private string encodeFilename(string filename) {
+            filename = filename.Replace("\\", " ");
+            filename = filename.Replace("/", " ");
+            filename = filename.Replace(":", " ");
+            filename = filename.Replace("*", " ");
+            filename = filename.Replace("?", " ");
+            filename = filename.Replace("<", " ");
+            filename = filename.Replace(">", " ");
+            filename = filename.Replace("|", " ");
+            filename = filename.Replace("\"", " ");
+            return filename;
+        }
+
         private void btnDownload_Click(object sender, RoutedEventArgs e) {
-            string imgPath = lbPath.Content + "\\" + htdo.name;
+            string imgPath = lbPath.Content + "\\" + encodeFilename(htdo.name);
+
             System.IO.Directory.CreateDirectory(imgPath);
 
             List<htDetailObject> htdoList = new List<htDetailObject>();
@@ -123,16 +137,21 @@ namespace hentai
                 img = System.Drawing.Image.FromStream(imgStream); 
             }
             img.Save(path);*/
-            request.BeginGetResponse(new AsyncCallback(ReadCallBack), request);
+            request.Proxy = null;
+            object[] passData = { request,  path };
+            request.BeginGetResponse(new AsyncCallback(ReadCallBack), passData);
         }
 
         private void ReadCallBack(IAsyncResult asyncResult) {
-            WebResponse response = (asyncResult.AsyncState as HttpWebRequest).EndGetResponse(asyncResult) as WebResponse;
+            object[] data = (object[])asyncResult.AsyncState;
+            //WebResponse response = (asyncResult.AsyncState as HttpWebRequest).EndGetResponse(asyncResult) as WebResponse;
+            WebResponse response = (data[0] as HttpWebRequest).EndGetResponse(asyncResult) as WebResponse;
+            string filename = data[1] as string;
             System.Drawing.Image img;
             using (Stream imgStream = response.GetResponseStream()) {
                 img = System.Drawing.Image.FromStream(imgStream);
             }
-            img.Save("");
+            img.Save(filename);
         }
 
         void scrollBar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {

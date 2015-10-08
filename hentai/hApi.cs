@@ -26,6 +26,7 @@ namespace hentai {
                 List<T> result;
                 WebRequest request = WebRequest.Create("http://hentai.lionfree.net/index.php/api/gtlist/" + page.ToString());
                 request.ContentType = "application/json; charset=utf-8";
+                request.Proxy = null;
                 
                 WebResponse response = request.GetResponse();
                 using (StreamReader sr = new StreamReader(response.GetResponseStream())) {
@@ -44,6 +45,7 @@ namespace hentai {
                 T result;
                 WebRequest request = WebRequest.Create(url);
                 request.ContentType = "application/json; charset=utf-8";
+                request.Proxy = null;
 
                 WebResponse response = request.GetResponse();
                 using (StreamReader sr = new StreamReader(response.GetResponseStream())) {
